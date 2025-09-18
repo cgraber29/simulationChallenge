@@ -1,14 +1,3 @@
----
-title: "Simulation Challenge"
-subtitle: "Generative Models and Monte Carlo Simulation"
-format:
-  html: default
-  pdf: default
-execute:
-  echo: true
-  eval: true
----
-
 # 🎲 Simulation Challenge - Monte Carlo Analysis
 
 ## Challenge Overview
@@ -22,3 +11,13 @@ This challenge pushes boundaries intentionally. You'll tackle problems that norm
 
 **The new reality:** The four stages of competence are Ignorance → Awareness → Learning → Mastery. AI lets us produce Mastery-level work while operating primarily in the Awareness stage. I focus on awareness training, you leverage AI for execution, and together we create outputs that used to require years of dedicated study.
 :::
+
+## The Investment Game 🎯
+
+### Original Game Strategy
+
+::: {#exm-ErgodicityEconomicsExample}
+Imagine you are offered the following game and given a $1,000 budget in a special account to play the game: I will flip a coin, and if it comes up heads, we increase your account's balance by 50%; if it comes up tails, we reduce your account's balance by 40%. We are not only doing this once, but we will do it once per year until you turn 55. When you turn 55, you will receive the balance in your account.
+:::
+
+### Generative DAG Model for the Investment Game
