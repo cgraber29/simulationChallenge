@@ -1,0 +1,24 @@
+---
+title: "Simulation Challenge"
+subtitle: "Generative Models and Monte Carlo Simulation"
+format:
+  html: default
+  pdf: default
+execute:
+  echo: true
+  eval: true
+---
+
+# 🎲 Simulation Challenge - Monte Carlo Analysis
+
+## Challenge Overview
+
+**Your Mission:** Create a comprehensive Quarto document that simulates one or two investment strategies, analyzes the results, and demonstrates your ability to present counter-intuitive findings compellingly. Then render the document to HTML and deploy it via GitHub Pages from a new repository called "simulationChallenge."
+
+::: {.callout-warning}
+## ⚠️ AI Partnership Required
+
+This challenge pushes boundaries intentionally. You'll tackle problems that normally require weeks of study, but with Cursor AI as your partner (and your brain keeping it honest), you can accomplish more than you thought possible.
+
+**The new reality:** The four stages of competence are Ignorance → Awareness → Learning → Mastery. AI lets us produce Mastery-level work while operating primarily in the Awareness stage. I focus on awareness training, you leverage AI for execution, and together we create outputs that used to require years of dedicated study.
+:::
