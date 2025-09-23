@@ -693,3 +693,130 @@ print(f"Mean balance: ${mean_balance:,.2f}")
 print(f"Median balance: ${median_balance:,.2f}")
 print(f"Probability above initial: {prob_above_initial:.3f}")
 ```
+
+## Answers for 75% Grade Tasks
+
+### Q1. Expected Value After 1 Coin Flip (Original Game)
+
+For one flip with initial wealth \( W_0 = 1000 \):
+
+- Heads (50%): \( W_1 = 1.5\times 1000 = 1500 \)
+- Tails (50%): \( W_1 = 0.6\times 1000 = 600 \)
+
+So the expected value is \( \mathbb{E}[W_1] = 0.5\times 1500 + 0.5\times 600 = 1050 \).
+
+```{python}
+#| label: ev-one-flip
+#| echo: true
+initial_wealth = 1000
+ev = 0.5 * 1.5 * initial_wealth + 0.5 * 0.6 * initial_wealth
+print(f"Expected value after 1 flip: ${ev:,.0f}")
+```
+
+### Q2. Expectation vs. Reality
+
+The expected value is positive ($1,050 > $1,000), suggesting an increase on average after one flip. However, over many flips, outcomes compound multiplicatively, so the typical path can behave very differently from the average—this becomes apparent when we simulate time paths.
+
+### Q3. Single Simulation of Account Balance Over Time
+
+Below is one simulated path from age 25 to 55 (30 flips), starting at $1,000.
+
+```{python}
+#| label: single-sim-investment
+#| fig-cap: Single simulated account balance from age 25 to 55 (Original Game)
+#| echo: true
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+np.random.seed(2025)
+
+start_age = 25
+end_age = 55
+n_flips = end_age - start_age  # 30 years
+initial_wealth = 1000.0
+
+def simulate_multiplicative_path(initial_wealth: float, n_flips: int, p_head: float = 0.5) -> pd.DataFrame:
+    wealth = initial_wealth
+    ages = [start_age]
+    balances = [wealth]
+    for _ in range(n_flips):
+        head = np.random.binomial(1, p_head)
+        wealth = wealth * (1.5 if head == 1 else 0.6)
+        ages.append(ages[-1] + 1)
+        balances.append(wealth)
+    return pd.DataFrame({"age": ages, "balance": balances})
+
+single_path = simulate_multiplicative_path(initial_wealth, n_flips)
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+ax.plot(single_path["age"], single_path["balance"], color="teal", linewidth=2, marker="o", markersize=4)
+ax.axhline(1000, color="gray", linestyle="--", linewidth=1, label="Initial $1,000")
+ax.set_title("Account Balance Over Time — Single Simulation (Original Game)", fontsize=13, fontweight="bold")
+ax.set_xlabel("Age")
+ax.set_ylabel("Account Balance ($)")
+ax.grid(True, alpha=0.3)
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"${x:,.0f}"))
+ax.legend()
+plt.tight_layout()
+plt.show()
+
+print("Final balance at age 55:", f"${single_path['balance'].iloc[-1]:,.2f}")
+```
+
+## Answers for 85% Grade Tasks
+
+### Q4. Distribution from 100 Simulations at Age 55
+
+We run 100 simulations from age 25 to 55, then plot the distribution of final balances at 55.
+
+```{python}
+#| label: hundred-sims-distribution
+#| fig-cap: Distribution of final balances at age 55 across 100 simulations (Original Game)
+#| echo: true
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+np.random.seed(2025)
+
+start_age = 25
+end_age = 55
+n_flips = end_age - start_age
+initial_wealth = 1000.0
+n_sims = 100
+
+def simulate_final_balance(initial_wealth: float, n_flips: int, p_head: float = 0.5) -> float:
+    wealth = initial_wealth
+    for _ in range(n_flips):
+        head = np.random.binomial(1, p_head)
+        wealth = wealth * (1.5 if head == 1 else 0.6)
+    return wealth
+
+final_balances = [simulate_final_balance(initial_wealth, n_flips) for _ in range(n_sims)]
+dist_df = pd.DataFrame({"sim": range(1, n_sims + 1), "final_balance": final_balances})
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+ax.hist(dist_df["final_balance"], bins=20, color="plum", alpha=0.85, edgecolor="black")
+ax.axvline(initial_wealth, color="red", linestyle="--", linewidth=2, label="Initial $1,000")
+ax.set_title("Final Balance Distribution at Age 55 — 100 Sims (Original Game)", fontsize=13, fontweight="bold")
+ax.set_xlabel("Final Balance ($)")
+ax.set_ylabel("Frequency")
+ax.grid(True, alpha=0.3)
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"${x:,.0f}"))
+ax.legend()
+plt.tight_layout()
+plt.show()
+
+print("Summary stats — mean, median, min, max, P(> $1,000):")
+mean_val = dist_df["final_balance"].mean()
+median_val = dist_df["final_balance"].median()
+prob_above_initial = (dist_df["final_balance"] > initial_wealth).mean()
+print(f"Mean: ${mean_val:,.2f}")
+print(f"Median: ${median_val:,.2f}")
+print(f"Min: ${dist_df['final_balance'].min():,.2f}")
+print(f"Max: ${dist_df['final_balance'].max():,.2f}")
+print(f"P(final > $1,000): {prob_above_initial:.3f}")
+```
