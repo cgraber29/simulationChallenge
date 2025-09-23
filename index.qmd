@@ -5,7 +5,7 @@ format:
   html: default
   pdf: default
 execute:
-  echo: true
+  echo: false
   eval: true
 ---
 
@@ -655,3 +655,147 @@ print(f"Probability above initial: {prob_above_initial:.3f}")
 ```
 
 :::
+```{r}
+
+suppressPackageStartupMessages(library(tidyverse))
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Number of simulations
+n_sims <- 10
+
+# Create simulation data
+sim_data <- tibble(
+  sim_num = 1:n_sims,
+  coin_flip = rbinom(n = n_sims, size = 1, prob = 0.5)
+) %>%
+  mutate(
+    winnings = if_else(coin_flip == 1, 100, -100)
+  )
+
+# Display results
+sim_data
+```
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+
+# Set seed for reproducibility
+set.seed(456)
+
+# Parameters
+initial_balance <- 1000
+n_periods <- 10
+n_sims <- 1  # Start with one simulation
+
+# Simulate one path
+simulate_path <- function(initial, periods) {
+  balance <- initial
+  path <- numeric(periods + 1)
+  path[1] <- initial
+  
+  for (i in 1:periods) {
+    coin_flip <- rbinom(1, 1, 0.5)
+    if (coin_flip == 1) {
+      balance <- balance + 100
+    } else {
+      balance <- balance - 100
+    }
+    path[i + 1] <- balance
+  }
+  
+  return(path)
+}
+
+# Run simulation
+time_series_data <- tibble(
+  period = 0:n_periods,
+  balance = simulate_path(initial_balance, n_periods)
+)
+
+# Create time series plot
+ggplot(time_series_data, aes(x = period, y = balance)) +
+  geom_line(color = "cadetblue", linewidth = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Account Balance Over Time",
+    subtitle = "Single Simulation Path",
+    x = "Period",
+    y = "Account Balance ($)",
+    caption = "Heads: +$100$, Tails: -$100$"
+  ) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12, color = "gray50")
+  )
+
+# Show the data
+time_series_data
+```
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+
+# Set seed for reproducibility
+set.seed(789)
+
+# Parameters
+initial_balance <- 1000
+n_periods <- 10
+n_sims <- 100  # Multiple simulations
+
+# Simulate multiple paths
+simulate_final_balance <- function(initial, periods) {
+  balance <- initial
+  for (i in 1:periods) {
+    coin_flip <- rbinom(1, 1, 0.5)
+    if (coin_flip == 1) {
+      balance <- balance + 100  # $100 gain
+    } else {
+      balance <- balance - 100  # $100 loss
+    }
+  }
+  return(balance)
+}
+
+# Run multiple simulations
+final_balances <- replicate(n_sims, simulate_final_balance(initial_balance, n_periods))
+
+# Create data frame
+distribution_data <- tibble(
+  sim_num = 1:n_sims,
+  final_balance = final_balances
+)
+
+# Create histogram
+ggplot(distribution_data, aes(x = final_balance)) +
+  geom_histogram(bins = 20, fill = "plum", alpha = 0.8, color = "black") +
+  geom_vline(xintercept = initial_balance, color = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Distribution of Final Account Balances",
+    subtitle = paste("100 Simulations,", n_periods, "Periods Each"),
+    x = "Final Balance ($)",
+    y = "Frequency",
+    caption = "Red line shows initial balance ($1,000)"
+  ) +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12, color = "gray50")
+  )
+
+# Summary statistics
+summary_stats <- distribution_data %>%
+  summarise(
+    mean_balance = mean(final_balance),
+    median_balance = median(final_balance),
+    prob_above_initial = mean(final_balance > initial_balance)
+  )
+
+print("Summary Statistics:")
+summary_stats
+```
