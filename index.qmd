@@ -334,34 +334,31 @@ sim_data <- tibble(
 sim_data
 ```
 
-### Python
+### R (Alternative)
 
-```{python}
-#| label: simple-sim-python
-#| fig-cap: Python simulation of coin flip game
+```{r}
+#| label: simple-sim-r-alt
+#| fig-cap: R simulation of coin flip game (alternative approach)
 #| echo: true
 
-import numpy as np
-import pandas as pd
-
 # Set seed for reproducibility
-np.random.seed(123)
+set.seed(123)
 
 # Number of simulations
-n_sims = 10
+n_sims <- 10
 
 # Step 1: Draw coin flips (stochastic node)
-X = np.random.binomial(n=1, p=0.5, size=n_sims)
+X <- rbinom(n = n_sims, size = 1, prob = 0.5)
 
 # Step 2: Compute winnings (deterministic node)
-W = np.where(X == 1, 100, -100)
+W <- ifelse(X == 1, 100, -100)
 
 # Combine into data frame
-sim_data = pd.DataFrame({
-    'sim_num': range(1, n_sims + 1),
-    'coin_flip': X,
-    'winnings': W
-})
+sim_data <- data.frame(
+  sim_num = 1:n_sims,
+  coin_flip = X,
+  winnings = W
+)
 
 # Display results
 sim_data
@@ -469,66 +466,69 @@ ggplot(time_series_data, aes(x = period, y = balance)) +
 time_series_data
 ```
 
-### Python
+### R (Alternative)
 
-```{python}
-#| label: timeseries-sim-python
-#| fig-cap: Python time-series simulation of account balance
+```{r}
+#| label: timeseries-sim-r-alt
+#| fig-cap: R time-series simulation of account balance (alternative approach)
 #| echo: true
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
 
 # Set seed for reproducibility
-np.random.seed(456)
+set.seed(456)
 
 # Parameters
-initial_balance = 1000
-n_periods = 10
-n_sims = 1  # Start with one simulation
+initial_balance <- 1000
+n_periods <- 10
+n_sims <- 1  # Start with one simulation
 
 # Simulate one path
-def simulate_path(initial, periods):
-    balance = initial
-    path = [initial]
-    
-    for i in range(periods):
-        coin_flip = np.random.binomial(1, 0.5)
-        if coin_flip == 1:
-            balance = balance + 100  # $100 gain
-        else:
-            balance = balance - 100  # $100 loss
-        path.append(balance)
-    
-    return path
+simulate_path <- function(initial, periods) {
+  balance <- initial
+  path <- numeric(periods + 1)
+  path[1] <- initial
+  
+  for (i in 1:periods) {
+    coin_flip <- rbinom(1, 1, 0.5)
+    if (coin_flip == 1) {
+      balance <- balance + 100  # $100 gain
+    } else {
+      balance <- balance - 100  # $100 loss
+    }
+    path[i + 1] <- balance
+  }
+  
+  return(path)
+}
 
 # Run simulation
-time_series_data = pd.DataFrame({
-    'period': range(n_periods + 1),
-    'balance': simulate_path(initial_balance, n_periods)
-})
+time_series_data <- tibble(
+  period = 0:n_periods,
+  balance = simulate_path(initial_balance, n_periods)
+)
 
 # Create time series plot
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(time_series_data['period'], time_series_data['balance'], 
-        color='cadetblue', linewidth=2, marker='o', markersize=6)
-ax.set_title('Account Balance Over Time\nSingle Simulation Path', 
-             fontsize=14, fontweight='bold')
-ax.set_xlabel('Period', fontsize=12)
-ax.set_ylabel('Account Balance ($)', fontsize=12)
-ax.grid(True, alpha=0.3)
-ax.set_ylim(0, max(time_series_data['balance']) * 1.1)
-
-# Format y-axis as currency
-ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-
-plt.tight_layout()
-plt.show()
+ggplot(time_series_data, aes(x = period, y = balance)) +
+  geom_line(color = "cadetblue", linewidth = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Account Balance Over Time",
+    subtitle = "Single Simulation Path",
+    x = "Period",
+    y = "Account Balance ($)",
+    caption = "Heads: +$100, Tails: -$100"
+  ) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12, color = "gray50")
+  )
 
 # Show the data
-print("Time Series Data:")
-print(time_series_data)
+time_series_data
 ```
 
 :::
@@ -610,71 +610,75 @@ print("Summary Statistics:")
 summary_stats
 ```
 
-### Python
+### R (Alternative)
 
-```{python}
-#| label: distribution-sim-python
-#| fig-cap: Python probability distribution of final balances
+```{r}
+#| label: distribution-sim-r-alt
+#| fig-cap: R probability distribution of final balances (alternative approach)
 #| echo: true
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
 
 # Set seed for reproducibility
-np.random.seed(789)
+set.seed(789)
 
 # Parameters
-initial_balance = 1000
-n_periods = 10
-n_sims = 100  # Multiple simulations
+initial_balance <- 1000
+n_periods <- 10
+n_sims <- 100  # Multiple simulations
 
 # Simulate multiple paths
-def simulate_final_balance(initial, periods):
-    balance = initial
-    for i in range(periods):
-        coin_flip = np.random.binomial(1, 0.5)
-        if coin_flip == 1:
-            balance = balance + 100  # $100 gain
-        else:
-            balance = balance - 100  # $100 loss
-    return balance
+simulate_final_balance <- function(initial, periods) {
+  balance <- initial
+  for (i in 1:periods) {
+    coin_flip <- rbinom(1, 1, 0.5)
+    if (coin_flip == 1) {
+      balance <- balance + 100  # $100 gain
+    } else {
+      balance <- balance - 100  # $100 loss
+    }
+  }
+  return(balance)
+}
 
 # Run multiple simulations
-final_balances = [simulate_final_balance(initial_balance, n_periods) for _ in range(n_sims)]
+final_balances <- replicate(n_sims, simulate_final_balance(initial_balance, n_periods))
 
 # Create data frame
-distribution_data = pd.DataFrame({
-    'sim_num': range(1, n_sims + 1),
-    'final_balance': final_balances
-})
+distribution_data <- tibble(
+  sim_num = 1:n_sims,
+  final_balance = final_balances
+)
 
 # Create histogram
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.hist(distribution_data['final_balance'], bins=20, color='plum', alpha=0.8, edgecolor='black')
-ax.axvline(initial_balance, color='red', linestyle='--', linewidth=2, label='Initial Balance')
-ax.set_title(f'Distribution of Final Account Balances\n100 Simulations, {n_periods} Periods Each', 
-             fontsize=14, fontweight='bold')
-ax.set_xlabel('Final Balance ($)', fontsize=12)
-ax.set_ylabel('Frequency', fontsize=12)
-ax.legend()
-ax.grid(True, alpha=0.3)
-
-# Format x-axis as currency
-ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-
-plt.tight_layout()
-plt.show()
+ggplot(distribution_data, aes(x = final_balance)) +
+  geom_histogram(bins = 20, fill = "plum", alpha = 0.8, color = "black") +
+  geom_vline(xintercept = initial_balance, color = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Distribution of Final Account Balances",
+    subtitle = paste("100 Simulations,", n_periods, "Periods Each"),
+    x = "Final Balance ($)",
+    y = "Frequency",
+    caption = "Red line shows initial balance ($1,000)"
+  ) +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12, color = "gray50")
+  )
 
 # Summary statistics
-mean_balance = distribution_data['final_balance'].mean()
-median_balance = distribution_data['final_balance'].median()
-prob_above_initial = (distribution_data['final_balance'] > initial_balance).mean()
+summary_stats <- distribution_data %>%
+  summarise(
+    mean_balance = mean(final_balance),
+    median_balance = median(final_balance),
+    prob_above_initial = mean(final_balance > initial_balance)
+  )
 
 print("Summary Statistics:")
-print(f"Mean balance: ${mean_balance:,.2f}")
-print(f"Median balance: ${median_balance:,.2f}")
-print(f"Probability above initial: {prob_above_initial:.3f}")
+summary_stats
 ```
 
 ## Answers for 75% Grade Tasks
@@ -688,12 +692,12 @@ For one flip with initial wealth \( W_0 = 1000 \):
 
 So the expected value is \( \mathbb{E}[W_1] = 0.5\times 1500 + 0.5\times 600 = 1050 \).
 
-```{python}
+```{r}
 #| label: ev-one-flip
 #| echo: true
-initial_wealth = 1000
-ev = 0.5 * 1.5 * initial_wealth + 0.5 * 0.6 * initial_wealth
-print(f"Expected value after 1 flip: ${ev:,.0f}")
+initial_wealth <- 1000
+ev <- 0.5 * 1.5 * initial_wealth + 0.5 * 0.6 * initial_wealth
+cat("Expected value after 1 flip: $", format(ev, big.mark = ",", digits = 0), "\n", sep = "")
 ```
 
 ### Q2. Expectation vs. Reality
@@ -704,48 +708,56 @@ The expected value is positive ($1,050 > $1,000), suggesting an increase on aver
 
 Below is one simulated path from age 25 to 55 (30 flips), starting at $1,000.
 
-```{python}
+```{r}
 #| label: single-sim-investment
 #| fig-cap: Single simulated account balance from age 25 to 55 (Original Game)
 #| echo: true
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
 
-np.random.seed(2025)
+set.seed(2025)
 
-start_age = 25
-end_age = 55
-n_flips = end_age - start_age  # 30 years
-initial_wealth = 1000.0
+start_age <- 25
+end_age <- 55
+n_flips <- end_age - start_age  # 30 years
+initial_wealth <- 1000.0
 
-def simulate_multiplicative_path(initial_wealth: float, n_flips: int, p_head: float = 0.5) -> pd.DataFrame:
-    wealth = initial_wealth
-    ages = [start_age]
-    balances = [wealth]
-    for _ in range(n_flips):
-        head = np.random.binomial(1, p_head)
-        wealth = wealth * (1.5 if head == 1 else 0.6)
-        ages.append(ages[-1] + 1)
-        balances.append(wealth)
-    return pd.DataFrame({"age": ages, "balance": balances})
+simulate_multiplicative_path <- function(initial_wealth, n_flips, p_head = 0.5) {
+  wealth <- initial_wealth
+  ages <- start_age
+  balances <- wealth
+  
+  for (i in 1:n_flips) {
+    head <- rbinom(1, 1, p_head)
+    wealth <- wealth * (ifelse(head == 1, 1.5, 0.6))
+    ages <- c(ages, start_age + i)
+    balances <- c(balances, wealth)
+  }
+  
+  return(tibble(age = ages, balance = balances))
+}
 
-single_path = simulate_multiplicative_path(initial_wealth, n_flips)
+single_path <- simulate_multiplicative_path(initial_wealth, n_flips)
 
-fig, ax = plt.subplots(figsize=(9, 5.5))
-ax.plot(single_path["age"], single_path["balance"], color="teal", linewidth=2, marker="o", markersize=4)
-ax.axhline(1000, color="gray", linestyle="--", linewidth=1, label="Initial $1,000")
-ax.set_title("Account Balance Over Time — Single Simulation (Original Game)", fontsize=13, fontweight="bold")
-ax.set_xlabel("Age")
-ax.set_ylabel("Account Balance ($)")
-ax.grid(True, alpha=0.3)
-ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"${x:,.0f}"))
-ax.legend()
-plt.tight_layout()
-plt.show()
+ggplot(single_path, aes(x = age, y = balance)) +
+  geom_line(color = "teal", linewidth = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  geom_hline(yintercept = 1000, color = "gray", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Account Balance Over Time — Single Simulation (Original Game)",
+    x = "Age",
+    y = "Account Balance ($)",
+    caption = "Dashed line shows initial $1,000"
+  ) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 13, face = "bold"),
+    panel.grid = element_line(alpha = 0.3)
+  )
 
-print("Final balance at age 55:", f"${single_path['balance'].iloc[-1]:,.2f}")
+cat("Final balance at age 55: $", format(single_path$balance[nrow(single_path)], big.mark = ",", digits = 2), "\n", sep = "")
 ```
 
 ## Answers for 85% Grade Tasks
@@ -754,52 +766,57 @@ print("Final balance at age 55:", f"${single_path['balance'].iloc[-1]:,.2f}")
 
 We run 100 simulations from age 25 to 55, then plot the distribution of final balances at 55.
 
-```{python}
+```{r}
 #| label: hundred-sims-distribution
 #| fig-cap: Distribution of final balances at age 55 across 100 simulations (Original Game)
 #| echo: true
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
 
-np.random.seed(2025)
+set.seed(2025)
 
-start_age = 25
-end_age = 55
-n_flips = end_age - start_age
-initial_wealth = 1000.0
-n_sims = 100
+start_age <- 25
+end_age <- 55
+n_flips <- end_age - start_age
+initial_wealth <- 1000.0
+n_sims <- 100
 
-def simulate_final_balance(initial_wealth: float, n_flips: int, p_head: float = 0.5) -> float:
-    wealth = initial_wealth
-    for _ in range(n_flips):
-        head = np.random.binomial(1, p_head)
-        wealth = wealth * (1.5 if head == 1 else 0.6)
-    return wealth
+simulate_final_balance <- function(initial_wealth, n_flips, p_head = 0.5) {
+  wealth <- initial_wealth
+  for (i in 1:n_flips) {
+    head <- rbinom(1, 1, p_head)
+    wealth <- wealth * (ifelse(head == 1, 1.5, 0.6))
+  }
+  return(wealth)
+}
 
-final_balances = [simulate_final_balance(initial_wealth, n_flips) for _ in range(n_sims)]
-dist_df = pd.DataFrame({"sim": range(1, n_sims + 1), "final_balance": final_balances})
+final_balances <- replicate(n_sims, simulate_final_balance(initial_wealth, n_flips))
+dist_df <- tibble(sim = 1:n_sims, final_balance = final_balances)
 
-fig, ax = plt.subplots(figsize=(9, 5.5))
-ax.hist(dist_df["final_balance"], bins=20, color="plum", alpha=0.85, edgecolor="black")
-ax.axvline(initial_wealth, color="red", linestyle="--", linewidth=2, label="Initial $1,000")
-ax.set_title("Final Balance Distribution at Age 55 — 100 Sims (Original Game)", fontsize=13, fontweight="bold")
-ax.set_xlabel("Final Balance ($)")
-ax.set_ylabel("Frequency")
-ax.grid(True, alpha=0.3)
-ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"${x:,.0f}"))
-ax.legend()
-plt.tight_layout()
-plt.show()
+ggplot(dist_df, aes(x = final_balance)) +
+  geom_histogram(bins = 20, fill = "plum", alpha = 0.85, color = "black") +
+  geom_vline(xintercept = initial_wealth, color = "red", linestyle = "dashed", linewidth = 2) +
+  labs(
+    title = "Final Balance Distribution at Age 55 — 100 Sims (Original Game)",
+    x = "Final Balance ($)",
+    y = "Frequency",
+    caption = "Red line shows initial $1,000"
+  ) +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 13, face = "bold"),
+    panel.grid = element_line(alpha = 0.3)
+  )
 
-print("Summary stats — mean, median, min, max, P(> $1,000):")
-mean_val = dist_df["final_balance"].mean()
-median_val = dist_df["final_balance"].median()
-prob_above_initial = (dist_df["final_balance"] > initial_wealth).mean()
-print(f"Mean: ${mean_val:,.2f}")
-print(f"Median: ${median_val:,.2f}")
-print(f"Min: ${dist_df['final_balance'].min():,.2f}")
-print(f"Max: ${dist_df['final_balance'].max():,.2f}")
-print(f"P(final > $1,000): {prob_above_initial:.3f}")
+cat("Summary stats — mean, median, min, max, P(> $1,000):\n")
+mean_val <- mean(dist_df$final_balance)
+median_val <- median(dist_df$final_balance)
+prob_above_initial <- mean(dist_df$final_balance > initial_wealth)
+cat("Mean: $", format(mean_val, big.mark = ",", digits = 2), "\n", sep = "")
+cat("Median: $", format(median_val, big.mark = ",", digits = 2), "\n", sep = "")
+cat("Min: $", format(min(dist_df$final_balance), big.mark = ",", digits = 2), "\n", sep = "")
+cat("Max: $", format(max(dist_df$final_balance), big.mark = ",", digits = 2), "\n", sep = "")
+cat("P(final > $1,000): ", round(prob_above_initial, 3), "\n", sep = "")
 ```
